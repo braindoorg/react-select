@@ -2456,11 +2456,19 @@ var _stripDiacritics = require('./stripDiacritics');
 
 var _stripDiacritics2 = _interopRequireDefault(_stripDiacritics);
 
+var _stripPunctuation = require('./stripPunctuation');
+
+var _stripPunctuation2 = _interopRequireDefault(_stripPunctuation);
+
 function filterOptions(options, filterValue, excludeOptions, props) {
 	var _this = this;
 
 	if (props.ignoreAccents) {
 		filterValue = (0, _stripDiacritics2['default'])(filterValue);
+	}
+
+	if (props.ignorePunctuation) {
+		filterValue = (0, _stripPunctuation2['default'])(filterValue, true);
 	}
 
 	if (props.ignoreCase) {
@@ -2477,6 +2485,10 @@ function filterOptions(options, filterValue, excludeOptions, props) {
 		if (!filterValue) return true;
 		var valueTest = String(option[props.valueKey]);
 		var labelTest = String(option[props.labelKey]);
+		if (props.ignorePunctuation) {
+			if (props.matchProp !== 'label') valueTest = (0, _stripPunctuation2['default'])(valueTest, props.ignorePunctuation);
+			if (props.matchProp !== 'value') labelTest = (0, _stripPunctuation2['default'])(labelTest, props.ignorePunctuation);
+		}
 		if (props.ignoreAccents) {
 			if (props.matchProp !== 'label') valueTest = (0, _stripDiacritics2['default'])(valueTest);
 			if (props.matchProp !== 'value') labelTest = (0, _stripDiacritics2['default'])(labelTest);
@@ -2491,7 +2503,7 @@ function filterOptions(options, filterValue, excludeOptions, props) {
 
 module.exports = filterOptions;
 
-},{"./stripDiacritics":12}],11:[function(require,module,exports){
+},{"./stripDiacritics":12,"./stripPunctuation":13}],11:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2566,6 +2578,15 @@ module.exports = function stripDiacritics(str) {
 		str = str.replace(map[i].letters, map[i].base);
 	}
 	return str;
+};
+
+},{}],13:[function(require,module,exports){
+'use strict';
+var punctuationList = /[.,\/'#!%\^?&\*;:{}=\-_`~()]/g;
+var empty = '';
+module.exports = function stripPunctuation(str, optionalBlackList) {
+  var theBlackList = optionalBlackList === true ? punctuationList : optionalBlackList;
+  return str.replace(theBlackList, empty);
 };
 
 },{}]},{},[7])(7)
