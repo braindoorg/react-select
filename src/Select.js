@@ -509,7 +509,7 @@ class Select extends React.Component {
 		if (this.props.simpleValue && value) {
 			value = this.props.multi ? value.map(i => i[this.props.valueKey]).join(this.props.delimiter) : value[this.props.valueKey];
 		}
-		this.props.onChange(value);
+		this.props.onChange(value, this.wrapper);
 	}
 
 	selectValue (value) {
