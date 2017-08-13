@@ -103,7 +103,7 @@ class Select extends React.Component {
 	}
 
 	componentWillUpdate (nextProps, nextState) {
-		if (nextState.isOpen !== this.state.isOpen) {
+		if (nextState.isOpen !== this.state.isOpen && !this.props.alwaysOpen) {
 			this.toggleTouchOutsideEvent(nextState.isOpen);
 			const handler = nextState.isOpen ? nextProps.onOpen : nextProps.onClose;
 			handler && handler();
@@ -112,12 +112,12 @@ class Select extends React.Component {
 
 	componentDidUpdate (prevProps, prevState) {
 		// focus to the selected option
-		if (this.menu && this.focused && this.state.isOpen && !this.hasScrolledToOption) {
+		if (this.menu && this.focused && this.isOpen() && !this.hasScrolledToOption) {
 			let focusedOptionNode = ReactDOM.findDOMNode(this.focused);
 			let menuNode = ReactDOM.findDOMNode(this.menu);
 			menuNode.scrollTop = focusedOptionNode.offsetTop;
 			this.hasScrolledToOption = true;
-		} else if (!this.state.isOpen) {
+		} else if (!this.isOpen()) {
 			this.hasScrolledToOption = false;
 		}
 
@@ -177,6 +177,11 @@ class Select extends React.Component {
 	focus () {
 		if (!this.input) return;
 		this.input.focus();
+	}
+	
+		
+	isOpen () {
+		return this.props.alwaysOpen || this.state.isOpen;
 	}
 
 	blurInput () {
@@ -269,7 +274,7 @@ class Select extends React.Component {
 			return;
 		}
 		// If the menu isn't open, let the event bubble to the main handleMouseDown
-		if (!this.state.isOpen) {
+		if (!this.isOpen()) {
 			return;
 		}
 		// prevent default event handlers
@@ -310,7 +315,7 @@ class Select extends React.Component {
 
 	handleInputFocus (event) {
 		if (this.props.disabled) return;
-		var isOpen = this.state.isOpen || this._openAfterFocus || this.props.openOnFocus;
+		var isOpen = this.isOpen() || this._openAfterFocus || this.props.openOnFocus;
 		if (this.props.onFocus) {
 			this.props.onFocus(event);
 		}
@@ -385,18 +390,18 @@ class Select extends React.Component {
 				}
 			return;
 			case 9: // tab
-				if (event.shiftKey || !this.state.isOpen || !this.props.tabSelectsValue) {
+				if (event.shiftKey || !this.isOpen() || !this.props.tabSelectsValue) {
 					return;
 				}
 				this.selectFocusedOption();
 			return;
 			case 13: // enter
-				if (!this.state.isOpen) return;
+				if (!this.isOpen()) return;
 				event.stopPropagation();
 				this.selectFocusedOption();
 			break;
 			case 27: // escape
-				if (this.state.isOpen) {
+				if (this.isOpen()) {
 					this.closeMenu();
 					event.stopPropagation();
 				} else if (this.props.clearable && this.props.escapeClearsValue) {
@@ -620,7 +625,7 @@ class Select extends React.Component {
 			.map((option, index) => ({ option, index }))
 			.filter(option => !option.option.disabled);
 		this._scrollToFocusedOptionOnUpdate = true;
-		if (!this.state.isOpen) {
+		if (!this.isOpen()) {
 			this.setState({
 				isOpen: true,
 				inputValue: '',
@@ -739,7 +744,7 @@ class Select extends React.Component {
 
 	renderInput (valueArray, focusedOptionIndex) {
 		var className = classNames('Select-input', this.props.inputProps.className);
-		const isOpen = !!this.state.isOpen;
+		const isOpen = !!this.isOpen();
 
 		const ariaOwns = classNames({
 			[this._instancePrefix + '-list']: isOpen,
@@ -829,7 +834,7 @@ class Select extends React.Component {
 
 	renderArrow () {
 		const onMouseDown = this.handleMouseDownOnArrow;
-		const isOpen = this.state.isOpen;
+		const isOpen = this.isOpen();
 		const arrow = this.props.arrowRenderer({ onMouseDown, isOpen });
 
 		return (
@@ -975,7 +980,7 @@ class Select extends React.Component {
 	render () {
 		let valueArray = this.getValueArray(this.props.value);
 		let options = this._visibleOptions = this.filterOptions(this.props.multi ? this.getValueArray(this.props.value) : null);
-		let isOpen = this.state.isOpen;
+		let isOpen = this.isOpen();
 		if (this.props.multi && !options.length && valueArray.length && !this.state.inputValue) isOpen = false;
 		const focusedOptionIndex = this.getFocusableOptionIndex(valueArray[0]);
 
@@ -1043,6 +1048,7 @@ class Select extends React.Component {
 
 Select.propTypes = {
     addLabelText: PropTypes.string,       // placeholder displayed when you want to add a label on a multi-value input
+ 		alwaysOpen: React.PropTypes.bool,			// enforces menu to always be open
     'aria-describedby': PropTypes.string, // HTML ID(s) of element(s) that should be used to describe this input (for assistive tech)
     'aria-label': PropTypes.string,       // Aria label (for assistive tech)
     'aria-labelledby': PropTypes.string,  // HTML ID of an element that should be used as the label (for assistive tech)
@@ -1116,6 +1122,7 @@ Select.propTypes = {
 
 Select.defaultProps = {
     addLabelText: 'Add "{label}"?',
+    alwaysOpen: false,
     arrowRenderer: defaultArrowRenderer,
     autosize: true,
     backspaceRemoves: true,
