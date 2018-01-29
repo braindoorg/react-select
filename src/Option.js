@@ -90,7 +90,7 @@ class Option extends React.Component {
 				onTouchEnd={this.handleTouchEnd}
 				id={instancePrefix + '-option-' + optionIndex}
 				title={option.title}
-				aria-label={this.props.options.value}>
+				aria-label={this.props.option.value}>
 				{this.props.children}
 			</div>
 		);
