@@ -855,8 +855,7 @@ var Option = (function (_React$Component) {
 					onTouchMove: this.handleTouchMove,
 					onTouchEnd: this.handleTouchEnd,
 					id: instancePrefix + '-option-' + optionIndex,
-					title: option.title,
-					'aria-label': this.props.oprion.value },
+					title: option.title },
 				this.props.children
 			);
 		}
