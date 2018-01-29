@@ -823,6 +823,7 @@ var Option = (function (_React$Component) {
 		key: 'onFocus',
 		value: function onFocus(event) {
 			if (!this.props.isFocused) {
+				console.log(this.props.options);
 				this.props.onFocus(this.props.option, event);
 			}
 		}

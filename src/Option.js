@@ -64,6 +64,7 @@ class Option extends React.Component {
 
 	onFocus (event) {
 		if (!this.props.isFocused) {
+			console.log(this.props.options);
 			this.props.onFocus(this.props.option, event);
 		}
 	}
