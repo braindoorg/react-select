@@ -64,7 +64,6 @@ class Option extends React.Component {
 
 	onFocus (event) {
 		if (!this.props.isFocused) {
-			console.log(this.props);
 			this.props.onFocus(this.props.option, event);
 		}
 	}
@@ -90,7 +89,8 @@ class Option extends React.Component {
 				onTouchMove={this.handleTouchMove}
 				onTouchEnd={this.handleTouchEnd}
 				id={instancePrefix + '-option-' + optionIndex}
-				title={option.title}>
+				title={option.title}
+				aria-label={this.props.options.value}>
 				{this.props.children}
 			</div>
 		);
